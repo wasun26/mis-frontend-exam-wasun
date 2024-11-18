@@ -64,10 +64,6 @@
                   variant="link"
                   @click="row.pin = !row.pin"
                 />
-
-                <!-- 
-              <Icon name="mdi:pin" />
-              <Icon name="mdi:pin-off" /> -->
                 <UToggle v-model="row.active" />
                 {{ row.active ? "เผยแพร่" : "ซ่อน" }}
               </div>
@@ -103,11 +99,11 @@
         </UTable>
       </UCard>
     </div>
-    <!-- <UTooltip text="รายละเอียดการตรวจสอบของผู้ดูแล" :popper="{ arrow: true }">
+    <!-- <UTooltip text="" :popper="{ arrow: true }">
     <UButton
       :to="
         localPath({
-          name: 'borrow-internal-asset-id',
+          name: 'id',
           params: { id: row.id },
         })
       "
