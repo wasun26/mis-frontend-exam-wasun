@@ -1,28 +1,31 @@
 <template>
-  <div class="flex items-center justify-center">
-    <div>
-      <UCard>
-        <template #header>
-          <span class="flex justify-center h1">เข้าสู่ระบบ</span>
-        </template>
+  <div>
+    <div class="flex justify-center items-center min-h-screen bg-gray-100">
+      <div
+        class="rounded-lg divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-gray-900 min-w-80 shadow-xl"
+      >
+        <div class="px-4 py-5 sm:px-6">
+          <p class="font-bold text-center text-xl">เข้าสู่ระบบ</p>
+        </div>
+        <div class="px-4 py-5 sm:p-6">
+          <UForm
+            :schema="schema"
+            :state="state"
+            class="space-y-4"
+            @submit="onSubmit"
+          >
+            <UFormGroup label="ผู้ใช้งาน" name="email">
+              <UInput v-model="state.email" />
+            </UFormGroup>
 
-        <UForm
-          :schema="schema"
-          :state="state"
-          class="space-y-4"
-          @submit="onSubmit"
-        >
-          <UFormGroup label="ผู้ใช้งาน" name="email">
-            <UInput v-model="state.email" />
-          </UFormGroup>
+            <UFormGroup label="รหัสผ่าน" name="password">
+              <UInput v-model="state.password" type="password" />
+            </UFormGroup>
 
-          <UFormGroup label="รหัสผ่าน" name="password">
-            <UInput v-model="state.password" type="password" />
-          </UFormGroup>
-
-          <UButton type="submit" block>เข้าสู่ระบบ</UButton>
-        </UForm>
-      </UCard>
+            <UButton type="submit" block>เข้าสู่ระบบ</UButton>
+          </UForm>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -36,6 +39,8 @@ async function login() {}
 
 import { object, string, type InferType } from "yup";
 import type { FormSubmitEvent } from "#ui/types";
+
+const router = useRouter();
 
 const schema = object({
   email: string().required("Required"),
@@ -52,7 +57,6 @@ const state = reactive({
 });
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-  console.log(event.data);
   loginAuth();
 }
 
@@ -69,6 +73,15 @@ const loginAuth = async () => {
     }
   );
   const data = await response.json();
-  localStorage.setItem("accessToken", data.accessToken);
+  localStorage.setItem("accessToken", data.access_token);
+
+  console.log(localStorage.getItem("accessToken"));
+
+  if (response.status === 200) {
+    useIToast().onSuccess("Login success");
+    router.push("/blogs");
+  } else {
+    useIToast().onError("Login failed");
+  }
 };
 </script>

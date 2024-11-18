@@ -1,14 +1,14 @@
-export { Blog };
+export { BlogsModel, Blog };
 
 declare global {
-  interface Blog {
+  interface BlogsModel {
     totalItems: number;
-    rows: Row[];
+    rows: Blog[];
     totalPages: number;
     currentPage: number;
   }
 
-  interface Row {
+  interface Blog {
     id: number;
     title: string;
     content: string;
