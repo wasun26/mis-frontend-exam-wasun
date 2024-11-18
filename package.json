@@ -10,8 +10,10 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@fortawesome/vue-fontawesome": "^3.0.8",
     "@nuxt/ui": "^2.19.2",
     "@nuxtjs/auth-next": "5.0.0-1667386184.dfbbb54",
+    "@nuxtjs/axios": "^5.13.6",
     "nuxt": "^3.14.159",
     "vue": "latest",
     "vue-router": "latest",

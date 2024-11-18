@@ -12,7 +12,7 @@
           class="space-y-4"
           @submit="onSubmit"
         >
-          <UFormGroup label="ผู้ใช้" name="email">
+          <UFormGroup label="ผู้ใช้งาน" name="email">
             <UInput v-model="state.email" />
           </UFormGroup>
 
@@ -38,7 +38,7 @@ import { object, string, type InferType } from "yup";
 import type { FormSubmitEvent } from "#ui/types";
 
 const schema = object({
-  email: string().email("Invalid email").required("Required"),
+  email: string().required("Required"),
   password: string()
     .min(8, "Must be at least 8 characters")
     .required("Required"),
@@ -52,7 +52,23 @@ const state = reactive({
 });
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-  // Do something with event.data
   console.log(event.data);
+  loginAuth();
 }
+
+const loginAuth = async () => {
+  const username = state.email;
+  const password = state.password;
+
+  const response = await fetch(
+    "https://exam-api.dev.mis.cmu.ac.th/api/auth/login",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    }
+  );
+  const data = await response.json();
+  localStorage.setItem("accessToken", data.accessToken);
+};
 </script>
