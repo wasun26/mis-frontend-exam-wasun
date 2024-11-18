@@ -12,7 +12,7 @@
             :schema="schema"
             :state="state"
             class="space-y-4"
-            @submit="onSubmit"
+            @submit="onSubmit()"
           >
             <UFormGroup label="ผู้ใช้งาน" name="email">
               <UInput v-model="state.email" />
@@ -42,6 +42,12 @@ import type { FormSubmitEvent } from "#ui/types";
 
 const router = useRouter();
 
+onMounted(async () => {
+  if (localStorage.getItem("accessToken")) {
+    router.push("/blogs");
+  }
+});
+
 const schema = object({
   email: string().required("Required"),
   password: string()
@@ -56,9 +62,9 @@ const state = reactive({
   password: undefined,
 });
 
-async function onSubmit(event: FormSubmitEvent<Schema>) {
+const onSubmit = () => {
   loginAuth();
-}
+};
 
 const loginAuth = async () => {
   const username = state.email;
@@ -81,7 +87,7 @@ const loginAuth = async () => {
     useIToast().onSuccess("Login success");
     router.push("/blogs");
   } else {
-    useIToast().onError("Login failed");
+    useIToast().onWarning("Login failed");
   }
 };
 </script>

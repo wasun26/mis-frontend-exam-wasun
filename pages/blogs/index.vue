@@ -1,8 +1,19 @@
 <template>
   <div>
-    <span class="text-xs">
-      *เชื่อม api แล้วแต่ยังไม่มี data เลย mock ไว้ ถ้ามี data จริงจะแทนที่ mock
-    </span>
+    <div class="flex justify-between">
+      <span class="text-xs">
+        *เชื่อม api แล้วแต่ยังไม่มี data เลย mock ไว้ ถ้ามี data จริงจะแทนที่
+        mock
+      </span>
+
+      <UButton
+        icon="heroicons:arrow-right-start-on-rectangle-16-solid"
+        color="gray"
+        variant="solid"
+        label="ออกจากระบบ"
+        @click="logoutAuth()"
+      />
+    </div>
     <div class="flex flex-col items-center justify-center p-6">
       <UCard
         :ui="{
@@ -32,7 +43,7 @@
         <UTable
           v-model="selected"
           head
-          :rows="blogs ? blogs.rows : mockBlogs.rows"
+          :rows="blogs?.rows.length > 0 ? blogs?.rows : mockBlogs.rows"
           :columns="headers"
         >
           <template #image-data="{ row }">
@@ -181,6 +192,24 @@ const getBlogs = async () => {
   if (response.status !== 200) {
     useIToast().onError("ดึงข้อมูลไม่ได้");
   }
+};
+
+const logoutAuth = async () => {
+  const response = await fetch(
+    "https://exam-api.dev.mis.cmu.ac.th/api/auth/logout",
+    {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+    }
+  );
+  localStorage.removeItem("accessToken");
+
+  useIToast().onSuccess("Logout success");
+  router.push("/login");
 };
 
 const selected = ref([]);

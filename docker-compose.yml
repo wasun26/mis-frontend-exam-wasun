@@ -1,0 +1,8 @@
+services:
+  nuxt:
+    build:
+      context: .
+    image: nuxt-app
+    container_name: nuxt-app
+    ports:
+      - ${PORT}:3000
