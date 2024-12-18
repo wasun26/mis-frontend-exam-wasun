@@ -130,6 +130,13 @@
 <script setup lang="ts">
 const router = useRouter();
 
+definePageMeta({
+  middleware: ["auth"],
+});
+
+const { startAutoRefresh } = useAuth();
+startAutoRefresh();
+
 onMounted(async () => {
   if (localStorage.getItem("accessToken")) {
     await getBlogs();
@@ -178,6 +185,10 @@ const mockBlogs = ref({
 });
 
 const getBlogs = async () => {
+  if (isTokenExpired()) {
+    refreshToken();
+  }
+
   const response = await fetch("https://exam-api.dev.mis.cmu.ac.th/api/blogs", {
     method: "GET",
     headers: {
@@ -210,6 +221,39 @@ const logoutAuth = async () => {
 
   useIToast().onSuccess("Logout success");
   router.push("/login");
+};
+
+const refreshToken = async () => {
+  const response = await fetch("/api/auth/refresh", {
+    method: "POST",
+    body: JSON.stringify({
+      refreshToken: localStorage.getItem("refreshToken"),
+    }),
+    headers: { "Content-Type": "application/json" },
+  });
+
+  if (response.ok) {
+    const data = await response.json();
+    const newToken = data.accessToken;
+    const expiration = new Date().getTime() + 5 * 60 * 1000; // 5 นาที
+
+    localStorage.setItem("accessToken", newToken);
+    localStorage.setItem("tokenExpiration", expiration.toString());
+  } else {
+    console.error("Failed to refresh token");
+    // ลบ token และนำผู้ใช้ไปหน้า Login
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("tokenExpiration");
+    navigateTo("/login");
+  }
+};
+
+const isTokenExpired = () => {
+  const expiration = localStorage.getItem("tokenExpiration");
+  if (!expiration) return true;
+
+  const now = new Date().getTime();
+  return now > parseInt(expiration, 10);
 };
 
 const selected = ref([]);

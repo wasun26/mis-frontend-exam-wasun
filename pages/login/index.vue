@@ -31,16 +31,10 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({
-  layout: "blank",
-});
-
-async function login() {}
-
 import { object, string, type InferType } from "yup";
-import type { FormSubmitEvent } from "#ui/types";
 
 const router = useRouter();
+const { login, logout,  } = useAuth();
 
 onMounted(async () => {
   if (localStorage.getItem("accessToken")) {
@@ -81,7 +75,8 @@ const loginAuth = async () => {
   const data = await response.json();
   localStorage.setItem("accessToken", data.access_token);
 
-  console.log(localStorage.getItem("accessToken"));
+  const expiration = new Date().getTime() + 5 * 60 * 1000;
+  localStorage.setItem("tokenExpiration", expiration.toString());
 
   if (response.status === 200) {
     useIToast().onSuccess("Login success");
