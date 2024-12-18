@@ -1,20 +1,15 @@
-# ใช้ Base Image ที่เบาและเร็ว
-FROM node:16-alpine
+FROM node:18-alpine
 
-# กำหนด Working Directory
+RUN apk add --no-cache bash
+
 WORKDIR /app
 
-# คัดลอกไฟล์ package.json และ package-lock.json
-COPY package*.json ./
+COPY package.json yarn.lock ./
 
-# ติดตั้ง Dependencies
-RUN yarn
+RUN yarn install
 
-# คัดลอกไฟล์ทั้งหมดไปยัง Container
 COPY . .
 
-# ใช้ Command เริ่มต้นสำหรับโหมดพัฒนา
-CMD ["yarn", "dev"]
-
-# กำหนด Port ที่ Container จะรับฟัง
 EXPOSE 3000
+
+CMD ["yarn", "dev", "-o"]

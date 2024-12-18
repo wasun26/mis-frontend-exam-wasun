@@ -15,6 +15,7 @@
     "@nuxt/utils": "^2.18.1",
     "@nuxtjs/auth-next": "5.0.0-1667386184.dfbbb54",
     "@nuxtjs/axios": "^5.13.6",
+    "dayjs": "^1.11.13",
     "nuxt": "^3.14.159",
     "vue": "latest",
     "vue-router": "latest",

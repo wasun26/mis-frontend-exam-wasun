@@ -33,8 +33,12 @@
 <script setup lang="ts">
 import { object, string, type InferType } from "yup";
 
+definePageMeta({
+  hideHeader: true,
+});
+
 const router = useRouter();
-const { login, logout,  } = useAuth();
+const { login, logout } = useAuth();
 
 onMounted(async () => {
   if (localStorage.getItem("accessToken")) {
