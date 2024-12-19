@@ -23,4 +23,15 @@ export default defineNuxtConfig({
       collections: ["uil", "mdi"],
     },
   },
+  runtimeConfig: {
+    public: {
+      appName: process.env.NUXT_PUBLIC_APP_NAME || "App Name",
+      webBase: process.env.NUXT_PUBLIC_WEB_BASE || "http://localhost:3000",
+      webPath: process.env.NUXT_PUBLIC_WEB_PATH || "/",
+      apiBase:
+        process.env.NUXT_PUBLIC_API_BASE ||
+        "https://exam-api.dev.mis.cmu.ac.th/",
+      apiPath: process.env.NUXT_PUBLIC_API_PATH || "/api/",
+    },
+  },
 });

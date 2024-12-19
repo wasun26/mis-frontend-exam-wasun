@@ -1,36 +1,44 @@
 <template>
-  {{ blog }}
+  <div class="p-6 max-w-4xl mx-auto">
+    <UCard class="shadow-md p-2 w-full">
+      <div class="flex items-center justify-between">
+        <h1 class="text-2xl font-bold mb-4">{{ blog?.title }}</h1>
+        <div class="flex items-center gap-2">
+          <span>
+            สถานะ: <strong>{{ blog?.active ? "เผยแพร่" : "ซ่อน" }}</strong>
+          </span>
 
-  <div class="container mx-auto py-10">
-    <n-skeleton v-if="isLoading" class="mb-4">
-      <template #default>
-        <h1 class="text-2xl font-bold mb-4">Loading...</h1>
-      </template>
-    </n-skeleton>
+          <UTooltip text="แก้ไขบทความ" :popper="{ arrow: true }">
+            <UButton
+              icon="i-heroicons-pencil-square"
+              color="yellow"
+              square
+              variant="solid"
+              @click="editBlog(Number(param.id))"
+            />
+          </UTooltip>
+        </div>
+      </div>
 
-    <div v-else>
-      <h1 class="text-2xl font-bold mb-4">{{ blog.title }}</h1>
-      <p class="text-gray-600 mb-6">{{ formattedDate }}</p>
+      <div class="flex items-center text-sm text-gray-500 mb-6">
+        <span>
+          <Icon name="uil:calendar-alt" />
+          {{ formatDate(blog?.createdAt) }}
+        </span>
+      </div>
 
-      <div class="mb-6">
+      <div class="flex flex-col items-center gap-6">
         <img
-          v-if="blog.img"
-          :src="blog.img"
-          alt="Blog Image"
-          class="rounded-lg shadow-md"
+          v-if="blog?.Img?.url"
+          :src="`https://exam-api.dev.mis.cmu.ac.th/${blog.Img.url}`"
+          alt="บทความ"
+          class="w-full max-w-lg object-cover rounded-md"
         />
+        <p class="text-gray-700 text-justify leading-relaxed">
+          {{ blog?.content }}
+        </p>
       </div>
-
-      <div class="text-lg leading-relaxed">
-        <p>{{ blog.content }}</p>
-      </div>
-    </div>
-
-    <div v-if="error" class="text-red-500 mt-6">
-      {{ error }}
-    </div>
-
-    <n-button class="mt-6" variant="outline" @click="goBack">Go Back</n-button>
+    </UCard>
   </div>
 </template>
 
@@ -40,52 +48,43 @@ definePageMeta({
 });
 const { startAutoRefresh } = useAuth();
 
-startAutoRefresh();
-
-const { getBlogById } = useBlog();
-
 const route = useRoute();
+const useBlogService = useBlog();
 const param = route.params;
 const blog = ref<Blog>(null as any);
 const isLoading = ref(true);
-const error = ref(null);
-
-const formattedDate = computed(() => {
-  if (!blog.value || !blog.value) return "";
-  const date = new Date(blog.value || "");
-  return date.toLocaleDateString("th-TH", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-});
 
 onMounted(() => {
   startAutoRefresh();
-  getBlogById(Number(param.id));
+  useBlogService.getBlogById(Number(param.id));
+  fetchBlog(Number(param.id));
 });
 
-// const getBlogByIdFun = async (id: number) => {
-//   const response = await fetch(
-//     "https://exam-api.dev.mis.cmu.ac.th/api/blogs/" + id,
-//     {
-//       method: "GET",
-//       headers: {
-//         "Content-Type": "application/json",
-//         Authorization: "Bearer " + localStorage.getItem("accessToken"),
-//       },
-//     }
-//   );
-//   const data = await response.json();
-//   blog.value = data;
+const formatDate = (dateString: Date) => {
+  if (!dateString) return "-";
+  const date = new Date(dateString);
+  return new Intl.DateTimeFormat("th-TH", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+};
 
-//   if (response.status !== 200) {
-//     useIToast().onError("ดึงข้อมูลไม่ได้");
-//   }
-// };
+const fetchBlog = async (blogId: number) => {
+  isLoading.value = true;
+  try {
+    const response = await useBlogService.getBlogById(blogId);
+    blog.value = response;
+  } catch (error) {
+    useIToast().onError("เกิดข้อผิดพลาดในการโหลดข้อมูลบทความ");
+  } finally {
+    isLoading.value = false;
+  }
+};
 
-// ฟังก์ชันกลับไปหน้ารายการบทความ
-const goBack = () => {
-  router.push("/blogs");
+const editBlog = (blogId: number) => {
+  navigateTo(`/blogs/${blogId}/update`);
 };
 </script>

@@ -1,45 +1,73 @@
 <template>
-  <div class="container mx-auto py-10">
-    <h1 class="text-2xl font-bold mb-6">Create a New Blog Post</h1>
+  <div class="p-6 flex justify-center">
+    <div class="w-full max-w-4xl">
+      <UCard class="shadow-md p-6 w-full">
+        <h1 class="text-xl font-bold mb-6">เพิ่มบทความ</h1>
 
-    <!-- Form -->
-    <form @submit.prevent="handleSubmit">
-      <!-- Title Input -->
-      <n-input
-        v-model="form.title"
-        label="Title"
-        placeholder="Enter the blog title"
-        :error="errors.title"
-        class="mb-4"
-      />
+        <form @submit.prevent="handleSubmit">
+          <div class="mb-4">
+            <label for="title" class="block text-sm font-medium text-gray-700">
+              หัวข้อ <span class="text-red-500">*</span>
+            </label>
+            <UInput
+              id="title"
+              v-model="form.title"
+              placeholder="กรอกหัวข้อบทความ"
+              class="mt-1"
+            />
+            <span v-if="errors.title" class="text-red-500 text-sm">{{
+              errors.title
+            }}</span>
+          </div>
 
-      <!-- Content Input -->
-      <n-textarea
-        v-model="form.content"
-        label="Content"
-        placeholder="Write the blog content..."
-        :error="errors.content"
-        rows="6"
-        class="mb-4"
-      />
+          <div class="mb-4">
+            <label
+              for="content"
+              class="block text-sm font-medium text-gray-700"
+            >
+              เนื้อหา <span class="text-red-500">*</span>
+            </label>
+            <UTextarea
+              id="content"
+              v-model="form.content"
+              :rows="5"
+              placeholder="กรอกเนื้อหาของบทความ"
+              class="mt-1"
+            />
+            <span v-if="errors.content" class="text-red-500 text-sm">{{
+              errors.content
+            }}</span>
+          </div>
 
-      <!-- Image Upload -->
-      <div class="mb-4">
-        <label class="block text-gray-700 font-medium mb-2">Upload Image</label>
-        <input
-          type="file"
-          @change="handleFileUpload"
-          accept="image/*"
-          class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100"
-        />
-        <span v-if="errors.image" class="text-red-500 text-sm">{{
-          errors.image
-        }}</span>
-      </div>
+          <div class="flex flex-col mb-6 gap-1">
+            <label for="image" class="block text-sm font-medium text-gray-700">
+              รูปภาพ
+            </label>
+            <FileInput v-model="form.image" />
+            <UDropzone
+              id="image"
+              @change="handleImageUpload"
+              class="mt-2"
+              placeholder="ลากรูปภาพมาวางที่นี่ หรือ คลิกเพื่อเลือกดูรูปภาพ"
+            />
+            <span v-if="errors.image" class="text-red-500 text-sm">{{
+              errors.image
+            }}</span>
+          </div>
 
-      <!-- Submit Button -->
-      <n-button type="submit" variant="solid" class="w-full"> Submit </n-button>
-    </form>
+          <div class="text-center">
+            <UButton
+              type="submit"
+              label="บันทึก"
+              color="blue"
+              size="lg"
+              class="w-full"
+              block
+            />
+          </div>
+        </form>
+      </UCard>
+    </div>
   </div>
 </template>
 
@@ -49,89 +77,67 @@ definePageMeta({
 });
 const { startAutoRefresh } = useAuth();
 
+const router = useRouter();
+const useBlogService = useBlog();
+
 onMounted(() => {
   startAutoRefresh();
 });
 
-// Form Data
 const form = ref({
   title: "",
   content: "",
-  image: null,
+  image: null as File | null,
 });
 
-// Validation Errors
 const errors = ref({
   title: "",
   content: "",
   image: "",
 });
 
-// Router
-const router = useRouter();
-
-/**
- * Validate form inputs
- */
-const validateForm = () => {
-  let isValid = true;
-  errors.value = { title: "", content: "", image: "" };
-
-  if (!form.value.title.trim()) {
-    errors.value.title = "Title is required.";
-    isValid = false;
-  }
-  if (!form.value.content.trim()) {
-    errors.value.content = "Content is required.";
-    isValid = false;
-  }
-  if (!form.value.image) {
-    errors.value.image = "Image is required.";
-    isValid = false;
-  }
-
-  return isValid;
-};
-
-const handleFileUpload = (event: any) => {
-  const file = event.target.files[0];
-  if (file) {
-    form.value.image = file;
-  }
-};
-
 const handleSubmit = async () => {
-  if (!validateForm()) {
-    return;
+  errors.value = {
+    title: "",
+    content: "",
+    image: "",
+  };
+
+  if (!form.value.title) {
+    errors.value.title = "กรุณากรอกหัวข้อบทความ";
+  }
+  if (!form.value.content) {
+    errors.value.content = "กรุณากรอกเนื้อหาของบทความ";
   }
 
-  // Prepare form data for API
-  const formData = new FormData();
-  formData.append("title", form.value.title);
-  formData.append("content", form.value.content);
-  if (form.value.image) {
-    formData.append("image", form.value.image);
-  }
+  if (errors.value.title || errors.value.content) return;
 
   try {
-    // Call API to create a new blog
-    const response = await useIFetch("/api/blogs", {
-      method: "POST",
-      body: formData,
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
+    const formData = new FormData();
+    formData.append("title", form.value.title);
+    formData.append("content", form.value.content);
+    if (form.value.image) {
+      formData.append("image", form.value.image);
+    }
+
+    const response = await useBlogService.createBlog({
+      title: form.value.title,
+      content: form.value.content,
+      blog_img: form.value.image || undefined,
     });
 
     if (response.error) {
-      console.error("API Error:", response.error);
-      return;
+      useIToast().onError("เกิดข้อผิดพลาดในการสร้างบทความ");
     }
 
-    console.log("Blog created successfully:", response);
-    router.push("/blogs"); // Redirect to blogs list
+    useIToast().onSuccess("บทความถูกสร้างเรียบร้อยแล้ว");
+    router.push("/blogs");
   } catch (error) {
-    console.error("Submission failed:", error);
+    useIToast().onError("เกิดข้อผิดพลาดในการสร้างบทความ");
   }
+};
+
+const handleImageUpload = (file: File) => {
+  form.value.image = file;
 };
 </script>

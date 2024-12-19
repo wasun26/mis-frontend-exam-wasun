@@ -35,16 +35,13 @@ import { object, string, type InferType } from "yup";
 
 definePageMeta({
   hideHeader: true,
+  middleware: ["auth"],
 });
 
 const router = useRouter();
 const { login, logout } = useAuth();
 
-onMounted(async () => {
-  if (localStorage.getItem("accessToken")) {
-    router.push("/blogs");
-  }
-});
+onMounted(async () => {});
 
 const schema = object({
   email: string().required("Required"),
@@ -56,12 +53,13 @@ const schema = object({
 type Schema = InferType<typeof schema>;
 
 const state = reactive({
-  email: undefined,
-  password: undefined,
+  email: "",
+  password: "",
 });
 
 const onSubmit = () => {
-  loginAuth();
+  // loginAuth();
+  login(state.email, state.password);
 };
 
 const loginAuth = async () => {
@@ -84,7 +82,7 @@ const loginAuth = async () => {
 
   if (response.status === 200) {
     useIToast().onSuccess("Login success");
-    router.push("/blogs");
+    navigateTo("/blogs");
   } else {
     useIToast().onWarning("Login failed");
   }

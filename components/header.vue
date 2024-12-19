@@ -1,33 +1,21 @@
 <template>
-  <div class="flex justify-between">
-    <span class="text-xs">
-      *เชื่อม api แล้วแต่ยังไม่มี data เลย mock ไว้ ถ้ามี data จริงจะแทนที่ mock
-    </span>
-
-    <UButton
-      icon="heroicons:arrow-right-start-on-rectangle-16-solid"
-      color="gray"
-      variant="solid"
-      label="ออกจากระบบ"
-      @click="logoutAuth()"
-    />
-  </div>
-
   <div
     class="flex items-center justify-between bg-white shadow-md p-4 rounded-lg"
   >
-    <!-- ส่วนข้อความ -->
     <div class="flex items-center gap-2">
-      <Icon name="heroicons:exclamation-circle" class="text-blue-500 h-5 w-5" />
-      <span class="text-sm text-gray-600 italic">
-        เชื่อม API แล้วแต่ยังไม่มีข้อมูลจริง ระบบกำลังแสดง Mock Data
-      </span>
+      <UBreadcrumb
+        divider="/"
+        :links="breadcrumbs"
+        :ui="{
+          active: 'text-xl font-bold text-blue-500',
+          inactive: 'text-xl font-bold text-gray-500',
+        }"
+      />
     </div>
 
-    <!-- ปุ่มออกจากระบบ -->
     <UButton
-      icon="heroicons:arrow-left-start-on-rectangle-20-solid"
-      color="red"
+      icon="heroicons:arrow-right-start-on-rectangle-20-solid"
+      color="gray"
       variant="soft"
       label="ออกจากระบบ"
       @click="logoutAuth()"
@@ -38,20 +26,47 @@
 
 <script setup lang="ts">
 const auth = useAuth();
+const route = useRoute();
+
+const useBlogService = useBlog();
+const blogTitle = ref<string | null>(null); // เก็บชื่อบทความ
+
+const fetchBlogTitle = async () => {
+  if (route.params.id) {
+    try {
+      const response = await useBlogService.getBlogById(
+        Number(route.params.id)
+      );
+      blogTitle.value = response.title || "ไม่มีชื่อบทความ";
+    } catch (error) {
+      console.error("Error fetching blog title:", error);
+      blogTitle.value = "ไม่พบข้อมูลบทความ";
+    }
+  }
+};
+
+const breadcrumbs = computed(() => {
+  const paths = [];
+  if (route.path.startsWith("/blogs")) {
+    paths.push({ label: "บทความ", to: "/blogs" });
+
+    if (route.path === "/blogs/create") {
+      paths.push({ label: "เพิ่มบทความ" });
+    } else if (route.name === "blogs-update") {
+      paths.push({
+        label: "แก้ไขบทความ",
+        to: `/blogs/${route.params.id}/update`,
+      });
+    } else if (route.name === "blogs-detail" || route.params.id) {
+      fetchBlogTitle();
+      paths.push({ label: blogTitle.value || "ไม่มีชื่อบทความ" });
+      paths.push({ label: "แก้ไขบทความ" });
+    }
+  }
+  return paths;
+});
 
 const logoutAuth = async () => {
-  //   const response = await fetch(
-  //     "https://exam-api.dev.mis.cmu.ac.th/api/auth/logout",
-  //     {
-  //       method: "DELETE",
-  //       headers: {
-  //         "Content-Type": "application/json",
-
-  //         Authorization: "Bearer " + useCookie("accessToken"),
-  //       },
-  //     }
-  //   );
-  //   localStorage.removeItem("accessToken");
   await auth.logout();
 };
 </script>

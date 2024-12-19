@@ -19,7 +19,7 @@ declare global {
     active: boolean;
     createdAt: Date;
     updatedAt: Date;
-    img: Img;
+    Img: Img;
   }
 
   interface Img {

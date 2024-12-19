@@ -2,23 +2,23 @@ export const useIToast = () => {
   const defaultNotifiers: Record<string, any> = {
     success: {
       icon: "i-fa6-solid-check",
-      color: "success",
+      color: "green",
     },
     info: {
       icon: "i-fa6-solid-circle-info",
-      color: "info",
+      color: "blue",
     },
     warning: {
       icon: "i-fa6-solid-triangle-exclamation",
-      color: "warning",
+      color: "orange",
     },
     error: {
       icon: "i-fa6-solid-circle-xmark",
-      color: "error",
+      color: "red",
     },
     delete: {
       icon: "i-fa6-solid-trash-can",
-      color: "rose",
+      color: "red",
     },
   };
 
