@@ -108,7 +108,6 @@ const errors = ref({
   image: "",
 });
 
-// ดึงข้อมูลบทความเมื่อเข้าเพจ
 const fetchBlogData = async () => {
   try {
     const response = await useBlogService.getBlogById(Number(route.params.id));
@@ -125,7 +124,6 @@ const fetchBlogData = async () => {
   }
 };
 
-// ฟังก์ชันอัปเดตบทความ
 const handleUpdate = async () => {
   errors.value = {
     title: "",

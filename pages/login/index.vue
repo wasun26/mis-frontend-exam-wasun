@@ -58,7 +58,6 @@ const state = reactive({
 });
 
 const onSubmit = () => {
-  // loginAuth();
   login(state.email, state.password);
 };
 
