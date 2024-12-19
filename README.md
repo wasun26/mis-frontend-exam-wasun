@@ -17,8 +17,8 @@ Before running the application, ensure you have the following installed:
 ### **1. Clone the Repository**
 
 ```bash
-git clone https://github.com/your-username/blog-management-system.git
-cd blog-management-system
+git clone https://github.com/wasun26/mis-frontend-exam-wasun.git
+cd mis-frontend-exam-wasun
 ```
 
 ### **2. Install Dependencies**
@@ -36,12 +36,15 @@ yarn install
 Create a `.env` file in the root directory and configure the following variables:
 
 ```env
-# API Configuration
+NUXT_PUBLIC_APP_NAME=CMU Asset Management
+NUXT_NODE_ENV=development
+NUXT_PUBLIC_WEB_BASE=http://localhost:3000
+NUXT_PUBLIC_WEB_PATH=/login/
 NUXT_PUBLIC_API_BASE=https://exam-api.dev.mis.cmu.ac.th
+NUXT_PUBLIC_API_PATH=/api/
 
-# Runtime Configuration
-ACCESS_TOKEN_SECRET=yourAccessTokenSecret
-REFRESH_TOKEN_SECRET=yourRefreshTokenSecret
+PORT=3000
+HOST=localhost
 ```
 
 ---
@@ -74,43 +77,16 @@ yarn start
 ### **1. Build the Docker Image**
 
 ```bash
-docker build -t blog-management-system .
+docker build -t mis-frontend-exam-wasun .
 ```
 
 ### **2. Run with Docker Compose**
 
 ```bash
-docker-compose up
+docker-compose --build up
 ```
 
 The application will be available at [http://localhost:3000](http://localhost:3000).
-
----
-
-## **Usage**
-
-1. Access the application in your browser.
-2. Login with your credentials to start managing blogs.
-3. Create, edit, publish, or delete articles as needed.
-
----
-
-## **Troubleshooting**
-
-- **If you encounter issues with API connectivity:**
-  - Check that the `NUXT_PUBLIC_API_BASE` variable in `.env` is correctly configured.
-- **If dependencies fail to install:**
-  - Ensure you are using the correct Node.js and Yarn versions.
-
----
-
-## **Contributing**
-
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature-branch`).
-3. Commit your changes (`git commit -m 'Add new feature'`).
-4. Push to the branch (`git push origin feature-branch`).
-5. Open a pull request.
 
 ---
 
